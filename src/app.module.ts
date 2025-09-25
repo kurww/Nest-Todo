@@ -5,10 +5,15 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TasklistsModule } from './tasklists/tasklists.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, TasksModule, TasklistsModule, UsersModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    TasksModule,
+    TasklistsModule,
+    UsersModule,
+  ],
 })
 export class AppModule {}

@@ -1,26 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateTasklistDto } from './dto/create-tasklist.dto';
 import { UpdateTasklistDto } from './dto/update-tasklist.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TasklistsService {
-  create(createTasklistDto: CreateTasklistDto) {
-    return 'This action adds a new tasklist';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createTasklistDto: CreateTasklistDto, userId: number) {
+    return this.prisma.taskList.create({
+      data: {
+        ...createTasklistDto,
+        userId,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all tasklists`;
+  async findAll(userId: number) {
+    return this.prisma.taskList.findMany({
+      where: { userId },
+      include: {
+        tasks: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tasklist`;
+  async findOne(id: number, userId: number) {
+    const tasklist = await this.prisma.taskList.findUnique({
+      where: { id },
+      include: {
+        tasks: true,
+      },
+    });
+
+    if (!tasklist) {
+      throw new NotFoundException('Tasklist not found');
+    }
+
+    if (tasklist.userId !== userId) {
+      throw new ForbiddenException('Access denied to this tasklist');
+    }
+
+    return tasklist;
   }
 
-  update(id: number, updateTasklistDto: UpdateTasklistDto) {
-    return `This action updates a #${id} tasklist`;
+  async update(
+    id: number,
+    updateTasklistDto: UpdateTasklistDto,
+    userId: number,
+  ) {
+    const tasklist = await this.findOne(id, userId);
+
+    return this.prisma.taskList.update({
+      where: { id },
+      data: updateTasklistDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tasklist`;
+  async remove(id: number, userId: number) {
+    const tasklist = await this.findOne(id, userId);
+
+    return this.prisma.taskList.delete({ where: { id } });
   }
 }

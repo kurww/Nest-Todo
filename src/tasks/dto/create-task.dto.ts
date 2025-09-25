@@ -6,4 +6,7 @@ export class CreateTaskDto {
 
   @ApiProperty({ example: false })
   completed: boolean;
+
+  @ApiProperty({ example: 1 })
+  taskListId: number;
 }
