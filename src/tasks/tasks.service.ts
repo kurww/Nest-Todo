@@ -20,7 +20,7 @@ export class TasksService {
     if (!taskList) {
       taskList = await this.prisma.taskList.create({
         data: {
-          title: 'Default List',
+          title: 'My List',
           userId,
         },
       });

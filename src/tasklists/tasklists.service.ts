@@ -29,6 +29,23 @@ export class TasklistsService {
     });
   }
 
+  async findDefault(userId: number) {
+    const tasklist = await this.prisma.taskList.findFirst({
+      where: { userId },
+      include: {
+        tasks: true,
+      },
+    });
+    if (!tasklist) {
+      throw new NotFoundException('Tasklist not found');
+    }
+
+    if (tasklist.userId !== userId) {
+      throw new ForbiddenException('Access denied to this tasklist');
+    }
+    return tasklist;
+  }
+
   async findOne(id: number, userId: number) {
     const tasklist = await this.prisma.taskList.findUnique({
       where: { id },

@@ -35,9 +35,9 @@ export class TasklistsController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [TasklistEntity] })
-  findAll(@Request() req: any) {
-    return this.tasklistsService.findAll(req.user.sub);
+  @ApiOkResponse({ type: TasklistEntity })
+  findDefault(@Request() req: any) {
+    return this.tasklistsService.findDefault(req.user.sub);
   }
 
   @Get(':id')
